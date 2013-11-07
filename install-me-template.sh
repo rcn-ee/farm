@@ -145,44 +145,53 @@ install_boot_files () {
 	if [ -f /boot/uboot/uImage ] ; then
 		echo "Backing up uImage as uImage_bak..."
 		sudo mv -v /boot/uboot/uImage /boot/uboot/uImage_bak
+		sync
 	fi
 
 	if [ -f /boot/uboot/zImage ] ; then
 		echo "Backing up zImage as zImage_bak..."
 		sudo mv -v /boot/uboot/zImage /boot/uboot/zImage_bak
+		sync
 	fi
 
 	if [ -f /boot/uboot/uInitrd ] ; then
 		echo "Backing up uInitrd as uInitrd_bak..."
 		sudo mv -v /boot/uboot/uInitrd /boot/uboot/uInitrd_bak
+		sync
 	fi
 
 	if [ -f /boot/uboot/initrd.img ] ; then
 		echo "Backing up initrd.img as initrd.bak..."
 		sudo mv -v /boot/uboot/initrd.img /boot/uboot/initrd.bak
+		sync
 	fi
 
 	if [ ! -f /boot/initrd.img-${kernel_version} ] ; then
 		echo "Creating /boot/initrd.img-${kernel_version}"
 		sudo update-initramfs -c -k ${kernel_version}
+		sync
 	fi
 
 	if [ "${has_mkimage}" ] ; then
 		if [ "${zreladdr}" ] ; then
 			echo "-----------------------------"
 			mkimage -A arm -O linux -T kernel -C none -a ${zreladdr} -e ${zreladdr} -n ${kernel_version} -d /boot/vmlinuz-${kernel_version} /boot/uboot/uImage
+			sync
 		fi
 		echo "-----------------------------"
 		mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n initramfs -d /boot/initrd.img-${kernel_version} /boot/uboot/uInitrd
+		sync
 	fi
 
 	echo "-----------------------------"
 	if [ -f /boot/zImage ] ; then
 		rm -rf /boot/zImage || true
 		cp -v /boot/vmlinuz-${kernel_version} /boot/zImage
+		sync
 	fi
 	cp -v /boot/vmlinuz-${kernel_version} /boot/uboot/zImage
 	cp -v /boot/initrd.img-${kernel_version} /boot/uboot/initrd.img
+	sync
 
 	echo "-----------------------------"
 	ls -lh /boot/uboot/*
@@ -197,6 +206,7 @@ install_files () {
 
 		if [ -d /boot/uboot/dtbs/ ] ; then
 			mv /boot/uboot/dtbs/ /boot/uboot/dtbs_bak/ || true
+			sync
 		fi
 
 		mkdir -p /boot/uboot/dtbs/ || true
@@ -209,6 +219,7 @@ install_files () {
 		mkdir -p /tmp/deb/dtb/
 		tar xf /tmp/deb/${dtb_file} -C /tmp/deb/dtb/
 		cp -v /tmp/deb/dtb/*.dtb /boot/uboot/dtbs/ 2>/dev/null || true
+		sync
 	fi
 
 	if [ "${firmware_file}" ] && [ -f "/tmp/deb/${firmware_file}" ] ; then
@@ -220,6 +231,7 @@ install_files () {
 		mkdir -p /tmp/deb/firmware/
 		tar xf /tmp/deb/${firmware_file} -C /tmp/deb/firmware/
 		cp -v /tmp/deb/firmware/*.dtbo /lib/firmware/ 2>/dev/null || true
+		sync
 	fi
 
 	if [ "${deb_file}" ] && [ -f "/tmp/deb/${deb_file}" ] ; then
@@ -230,6 +242,7 @@ install_files () {
 }
 
 all_done () {
+	sync
 	echo "Script done: please reboot"
 }
 
