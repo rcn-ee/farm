@@ -108,6 +108,10 @@ parse_index_html () {
 	unset firmware_file
 	firmware_file=$(cat /tmp/deb/index.html | grep firmware.tar.gz | head -n 1)
 	firmware_file=$(echo ${firmware_file} | awk -F "\"" '{print $2}')
+
+	unset thirdparty_file
+	thirdparty_file=$(cat /tmp/deb/index.html | grep thirdparty | head -n 1)
+	thirdparty_file=$(echo ${thirdparty_file} | awk -F "\"" '{print $2}')
 }
 
 dl_files () {
@@ -130,6 +134,19 @@ dl_files () {
 			rm -rf /tmp/deb/${firmware_file} || true
 		fi
 		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${firmware_file}
+	fi
+}
+
+install_third_party () {
+	if [ "${thirdparty_file}" ] ; then
+		if [ -f /tmp/deb/${thirdparty_file} ] ; then
+			rm -rf /tmp/deb/${thirdparty_file} || true
+		fi
+		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${thirdparty_file}
+		if [ -f /tmp/deb/thirdparty ] ; then
+			sudo /bin/sh /tmp/deb/thirdparty
+			sudo depmod ${kernel_version} -a
+		fi
 	fi
 }
 
@@ -237,6 +254,7 @@ install_files () {
 	if [ "${deb_file}" ] && [ -f "/tmp/deb/${deb_file}" ] ; then
 		echo "Installing [${deb_file}]"
 		dpkg -i /tmp/deb/${deb_file}
+		install_third_party
 		install_boot_files
 	fi
 }
