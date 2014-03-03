@@ -30,7 +30,7 @@ release="release_VAR"
 dpkg_arch="dpkg_arch_VAR"
 version="version_VAR"
 
-mirror="http://rcn-ee.net/deb"
+mirror="https://rcn-ee.net/deb"
 
 use_mirror="disabled"
 if [ "x${use_mirror}" = "xenabled" ] ; then
