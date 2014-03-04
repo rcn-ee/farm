@@ -1,6 +1,6 @@
 #!/bin/sh -e
 #
-# Copyright (c) 2013 Robert Nelson <robertcnelson@gmail.com>
+# Copyright (c) 2013-2014 Robert Nelson <robertcnelson@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,14 @@ system_checks () {
 		fi
 	else
 		apt-get install -y initramfs-tools
+	fi
+
+	unset third_party_modules
+	if [ -f /etc/rcn-ee.conf ] ; then
+		. /etc/rcn-ee.conf
+		if [ "${debug}" ] ; then
+			echo "Debug: third party modules : [${third_party_modules}]"
+		fi
 	fi
 }
 
@@ -254,7 +262,9 @@ install_files () {
 	if [ "${deb_file}" ] && [ -f "/tmp/deb/${deb_file}" ] ; then
 		echo "Installing [${deb_file}]"
 		dpkg -i /tmp/deb/${deb_file}
-		install_third_party
+		if [ "x${third_party_modules}" = "xenable" ] ; then
+			install_third_party
+		fi
 		install_boot_files
 	fi
 }
