@@ -21,8 +21,8 @@
 		file_upload="${CHROOT_DIR}/${release}-${dpkg_arch}/build/buildd/${mt7601}/RT2870STA.dat"
 		if [ -f ${file_upload} ] ; then
 			generic_upload
-			echo "mkdir -p /etc/Wireless/RT2870/" >> /build/buildd/thirdparty
-			echo "wget ${file_dir}RT2870STA.dat -O /etc/Wireless/RT2870/RT2870STA.dat" >> /build/buildd/thirdparty
+			echo "mkdir -p /etc/Wireless/RT2870STA/" >> /build/buildd/thirdparty
+			echo "wget ${file_dir}RT2870STA.dat -O /etc/Wireless/RT2870STA/RT2870STA.dat" >> /build/buildd/thirdparty
 		fi
 		file_upload="${CHROOT_DIR}/${release}-${dpkg_arch}/build/buildd/${mt7601}/os/linux/mt7601Usta.ko"
 		if [ -f ${file_upload} ] ; then
@@ -37,3 +37,4 @@
 
 		cleanup_third_party
 	fi
+
