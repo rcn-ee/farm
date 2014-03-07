@@ -14,6 +14,10 @@
 			cd ${CHROOT_DIR}/${release}-${dpkg_arch}/build/buildd/
 			tar xf ${mt7601}.tar.bz2
 			rm -rf ${mt7601}.tar.bz2 || true
+
+			#Quiet dmesg noise...
+			sed -i -e 's:RT_DEBUG_TRACE:RT_DEBUG_WARN:g' ./${mt7601}/os/linux/rt_linux.c
+
 			cd /build/buildd/${mt7601}
 			make_mt7601="make ARCH=arm CROSS_COMPILE= LINUX_SRC=/build/buildd/linux-src all"
 			schroot -c ${release}-${dpkg_arch} -u ${CHROOTUSER} -- ${make_mt7601}
