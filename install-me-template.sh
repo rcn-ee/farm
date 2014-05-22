@@ -113,10 +113,6 @@ parse_index_html () {
 	dtb_file=$(cat /tmp/deb/index.html | grep dtbs.tar.gz | head -n 1)
 	dtb_file=$(echo ${dtb_file} | awk -F "\"" '{print $2}')
 
-	unset firmware_file
-	firmware_file=$(cat /tmp/deb/index.html | grep firmware.tar.gz | head -n 1)
-	firmware_file=$(echo ${firmware_file} | awk -F "\"" '{print $2}')
-
 	unset thirdparty_file
 	thirdparty_file=$(cat /tmp/deb/index.html | grep thirdparty | head -n 1)
 	thirdparty_file=$(echo ${thirdparty_file} | awk -F "\"" '{print $2}')
@@ -135,13 +131,6 @@ dl_files () {
 			rm -rf /tmp/deb/${dtb_file} || true
 		fi
 		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${dtb_file}
-	fi
-
-	if [ "${firmware_file}" ] ; then
-		if [ -f /tmp/deb/${firmware_file} ] ; then
-			rm -rf /tmp/deb/${firmware_file} || true
-		fi
-		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${firmware_file}
 	fi
 }
 
@@ -251,18 +240,6 @@ install_files () {
 		mkdir -p /tmp/deb/dtb/
 		tar xf /tmp/deb/${dtb_file} -C /tmp/deb/dtb/
 		cp -v /tmp/deb/dtb/*.dtb ${bootdir}/dtbs/ 2>/dev/null || true
-		sync
-	fi
-
-	if [ "${firmware_file}" ] && [ -f "/tmp/deb/${firmware_file}" ] ; then
-		if [ -d /tmp/deb/firmware/ ] ; then
-			rm -rf /tmp/deb/firmware/ || true
-		fi
-
-		echo "Installing [${firmware_file}]"
-		mkdir -p /tmp/deb/firmware/
-		tar xf /tmp/deb/${firmware_file} -C /tmp/deb/firmware/
-		cp -v /tmp/deb/firmware/*.dtbo /lib/firmware/ 2>/dev/null || true
 		sync
 	fi
 
