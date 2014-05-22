@@ -222,8 +222,13 @@ install_boot_files () {
 }
 
 install_files () {
+	#legacy
 	if [ -f "/boot/uboot/SOC.sh" ] ; then
 		bootdir="/boot/uboot"
+	fi
+	#it's a new dawn
+	if [ -f "/boot/SOC.sh" ] ; then
+		bootdir="/boot"
 	fi
 
 	if [ "${dtb_file}" ] && [ -f "/tmp/deb/${dtb_file}" ] ; then
