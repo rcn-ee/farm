@@ -166,8 +166,10 @@ install_boot_files () {
 		fi
 	fi
 
+	unset need_uimage_uinitrd
 	echo "-----------------------------"
 	if [ -f ${bootdir}/uImage ] ; then
+		need_uimage_uinitrd="enable"
 		echo "Backing up uImage as uImage_bak..."
 		sudo mv -v ${bootdir}/uImage ${bootdir}/uImage_bak
 		sync
@@ -180,6 +182,7 @@ install_boot_files () {
 	fi
 
 	if [ -f ${bootdir}/uInitrd ] ; then
+		need_uimage_uinitrd="enable"
 		echo "Backing up uInitrd as uInitrd_bak..."
 		sudo mv -v ${bootdir}/uInitrd ${bootdir}/uInitrd_bak
 		sync
@@ -197,7 +200,7 @@ install_boot_files () {
 		sync
 	fi
 
-	if [ "${has_mkimage}" ] ; then
+	if [ "${has_mkimage}" ] && [ "x${need_uimage_uinitrd}" = "xenable" ] ; then
 		if [ "${zreladdr}" ] ; then
 			echo "-----------------------------"
 			mkimage -A arm -O linux -T kernel -C none -a ${zreladdr} -e ${zreladdr} -n ${kernel_version} -d /boot/vmlinuz-${kernel_version} ${bootdir}/uImage
