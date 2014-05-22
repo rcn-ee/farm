@@ -159,35 +159,35 @@ install_third_party () {
 }
 
 install_boot_files () {
-	if [ -f "/boot/uboot/SOC.sh" ] ; then
-		. "/boot/uboot/SOC.sh"
+	if [ -f "${bootdir}/SOC.sh" ] ; then
+		. "${bootdir}/SOC.sh"
 		if [ ! "${zreladdr}" ] ; then
 			zreladdr=${load_addr}
 		fi
 	fi
 
 	echo "-----------------------------"
-	if [ -f /boot/uboot/uImage ] ; then
+	if [ -f ${bootdir}/uImage ] ; then
 		echo "Backing up uImage as uImage_bak..."
-		sudo mv -v /boot/uboot/uImage /boot/uboot/uImage_bak
+		sudo mv -v ${bootdir}/uImage ${bootdir}/uImage_bak
 		sync
 	fi
 
-	if [ -f /boot/uboot/zImage ] ; then
+	if [ -f ${bootdir}/zImage ] ; then
 		echo "Backing up zImage as zImage_bak..."
-		sudo mv -v /boot/uboot/zImage /boot/uboot/zImage_bak
+		sudo mv -v ${bootdir}/zImage ${bootdir}/zImage_bak
 		sync
 	fi
 
-	if [ -f /boot/uboot/uInitrd ] ; then
+	if [ -f ${bootdir}/uInitrd ] ; then
 		echo "Backing up uInitrd as uInitrd_bak..."
-		sudo mv -v /boot/uboot/uInitrd /boot/uboot/uInitrd_bak
+		sudo mv -v ${bootdir}/uInitrd ${bootdir}/uInitrd_bak
 		sync
 	fi
 
-	if [ -f /boot/uboot/initrd.img ] ; then
+	if [ -f ${bootdir}/initrd.img ] ; then
 		echo "Backing up initrd.img as initrd.bak..."
-		sudo mv -v /boot/uboot/initrd.img /boot/uboot/initrd.bak
+		sudo mv -v ${bootdir}/initrd.img ${bootdir}/initrd.bak
 		sync
 	fi
 
@@ -200,41 +200,40 @@ install_boot_files () {
 	if [ "${has_mkimage}" ] ; then
 		if [ "${zreladdr}" ] ; then
 			echo "-----------------------------"
-			mkimage -A arm -O linux -T kernel -C none -a ${zreladdr} -e ${zreladdr} -n ${kernel_version} -d /boot/vmlinuz-${kernel_version} /boot/uboot/uImage
+			mkimage -A arm -O linux -T kernel -C none -a ${zreladdr} -e ${zreladdr} -n ${kernel_version} -d /boot/vmlinuz-${kernel_version} ${bootdir}/uImage
 			sync
 		fi
 		echo "-----------------------------"
-		mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n initramfs -d /boot/initrd.img-${kernel_version} /boot/uboot/uInitrd
+		mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n initramfs -d /boot/initrd.img-${kernel_version} ${bootdir}/uInitrd
 		sync
 	fi
 
 	echo "-----------------------------"
-	if [ -f /boot/zImage ] ; then
-		rm -rf /boot/zImage || true
-		cp -v /boot/vmlinuz-${kernel_version} /boot/zImage
-		sync
-	fi
-	cp -v /boot/vmlinuz-${kernel_version} /boot/uboot/zImage
-	cp -v /boot/initrd.img-${kernel_version} /boot/uboot/initrd.img
+	cp -v /boot/vmlinuz-${kernel_version} ${bootdir}/zImage
+	cp -v /boot/initrd.img-${kernel_version} ${bootdir}/initrd.img
 	sync
 
 	echo "-----------------------------"
-	ls -lh /boot/uboot/*
+	ls -lh ${bootdir}/*
 	echo "-----------------------------"
 }
 
 install_files () {
+	if [ -f "/boot/uboot/SOC.sh" ] ; then
+		bootdir="/boot/uboot"
+	fi
+
 	if [ "${dtb_file}" ] && [ -f "/tmp/deb/${dtb_file}" ] ; then
-		if [ -d /boot/uboot/dtbs_bak/ ] ; then
-			rm -rf /boot/uboot/dtbs_bak/ || true
+		if [ -d ${bootdir}/dtbs_bak/ ] ; then
+			rm -rf ${bootdir}/dtbs_bak/ || true
 		fi
 
-		if [ -d /boot/uboot/dtbs/ ] ; then
-			mv /boot/uboot/dtbs/ /boot/uboot/dtbs_bak/ || true
+		if [ -d ${bootdir}/dtbs/ ] ; then
+			mv ${bootdir}/dtbs/ ${bootdir}/dtbs_bak/ || true
 			sync
 		fi
 
-		mkdir -p /boot/uboot/dtbs/ || true
+		mkdir -p ${bootdir}/dtbs/ || true
 
 		if [ -d /tmp/deb/dtb/ ] ; then
 			rm -rf /tmp/deb/dtb/ || true
@@ -243,7 +242,7 @@ install_files () {
 		echo "Installing [${dtb_file}]"
 		mkdir -p /tmp/deb/dtb/
 		tar xf /tmp/deb/${dtb_file} -C /tmp/deb/dtb/
-		cp -v /tmp/deb/dtb/*.dtb /boot/uboot/dtbs/ 2>/dev/null || true
+		cp -v /tmp/deb/dtb/*.dtb ${bootdir}/dtbs/ 2>/dev/null || true
 		sync
 	fi
 
