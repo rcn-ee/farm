@@ -204,9 +204,6 @@ install_boot_files () {
 	cp -v /boot/vmlinuz-${kernel_version} ${bootdir}/zImage
 	cp -v /boot/initrd.img-${kernel_version} ${bootdir}/initrd.img
 	sync
-
-	echo "-----------------------------"
-	ls -lh ${bootdir}/*
 	echo "-----------------------------"
 }
 
