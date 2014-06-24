@@ -237,8 +237,8 @@ install_files () {
 
 		echo "Installing [${dtb_file}]"
 		mkdir -p /tmp/deb/dtb/
-		tar xf /tmp/deb/${dtb_file} -C /tmp/deb/dtb/
-		cp -v /tmp/deb/dtb/*.dtb ${bootdir}/dtbs/ 2>/dev/null || true
+		tar xmf /tmp/deb/${dtb_file} -C /tmp/deb/dtb/
+		cp /tmp/deb/dtb/*.dtb ${bootdir}/dtbs/ 2>/dev/null || true
 		sync
 	fi
 
