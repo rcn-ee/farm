@@ -53,6 +53,19 @@ system_checks () {
 		exit
 	fi
 
+	test_rcnee=$(cat /etc/apt/sources.list | grep rcn-ee || true)
+	if [ ! "x${test_rcnee}" = "x" ] ; then
+		echo ""
+		echo "Error: this script is no longer supported for [repos.rcn-ee.net]"
+		echo "Please use:"
+		echo "cd /opt/script/tools/"
+		echo "git pull"
+		echo "sudo ./update_kernel.sh"
+		echo "or:"
+		echo "sudo ./update_kernel.sh --kernel v3.x.x-x"
+		exit
+	fi
+
 	unset command_check
 	command_check=$(which mkimage 2>/dev/null)
 	if [ "${command_check}" ] ; then
