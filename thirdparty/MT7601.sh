@@ -1,13 +1,12 @@
 	file_dir="https://rcn-ee.net/deb/${release}-${dpkg_arch}/${FTPDIR}/"
 	if [ "x${SUBARCH}" = "xomap-psp" ] ; then
-		third_party="http://rcn-ee.net/deb/thirdparty"
 		mt7601="DPO_MT7601U_LinuxSTA_3.0.0.4_20130913"
 
 		cleanup_third_party
 
 		echo '#!/bin/sh' > /build/buildd/thirdparty
 
-		${wget_dl} ${third_party}/MT7601/${mt7601}.tar.bz2
+		${wget_dl} ${local_http}/MT7601/${mt7601}.tar.bz2
 		if [ -f /build/buildd/${mt7601}.tar.bz2 ] ; then
 			mkdir -p /build/buildd/${mt7601}
 			mv /build/buildd/${mt7601}.tar.bz2 ${CHROOT_DIR}/${release}-${dpkg_arch}/build/buildd/
@@ -20,7 +19,7 @@
 
 			cd /build/buildd/${mt7601}
 			make_mt7601="make ARCH=arm CROSS_COMPILE= LINUX_SRC=/build/buildd/linux-src all"
-			schroot -c ${release}-${dpkg_arch} -u ${CHROOTUSER} -- ${make_mt7601}
+			schroot -c ${release}-${dpkg_arch} -u ${chroot_user} -- ${make_mt7601}
 		fi
 		file_upload="${CHROOT_DIR}/${release}-${dpkg_arch}/build/buildd/${mt7601}/RT2870STA.dat"
 		if [ -f ${file_upload} ] ; then
