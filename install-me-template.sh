@@ -92,6 +92,24 @@ system_checks () {
 			echo "Debug: third party modules : [${third_party_modules}]"
 		fi
 	fi
+
+	unset wget_version
+	wget_version=$(LC_ALL=C wget --version | grep "GNU Wget" | awk '{print $3}' | awk -F '.' '{print $2}' || true)
+	case "${wget_version}" in
+	12|13)
+		#wget before 1.14 in debian does not support sni
+		echo "wget: [`LC_ALL=C wget --version | grep \"GNU Wget\" | awk '{print $3}' || true`]"
+		echo "wget: [this version of wget does not support sni, using --no-check-certificate]"
+		echo "wget: [http://en.wikipedia.org/wiki/Server_Name_Indication]"
+		dl="wget --no-check-certificate"
+		;;
+	*)
+		dl="wget"
+		;;
+	esac
+
+	dl_continue="${dl} -c"
+	dl_quiet="${dl} --no-verbose"
 }
 
 get_html_file_list () {
@@ -99,7 +117,7 @@ get_html_file_list () {
 	if [ -f /tmp/deb/index.html ] ; then
 		rm -rf /tmp/deb/index.html || true
 	fi
-	wget --no-verbose --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/
+	${dl_quiet} --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/
 
 	cat /tmp/deb/index.html | grep "<a href=" > /tmp/deb/temp.html
 	sed -i -e "s/<a href/\\n<a href/g" /tmp/deb/temp.html
@@ -136,14 +154,14 @@ dl_files () {
 		if [ -f /tmp/deb/${deb_file} ] ; then
 			rm -rf /tmp/deb/${deb_file} || true
 		fi
-		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${deb_file}
+		${dl} --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${deb_file}
 	fi
 
 	if [ "${dtb_file}" ] ; then
 		if [ -f /tmp/deb/${dtb_file} ] ; then
 			rm -rf /tmp/deb/${dtb_file} || true
 		fi
-		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${dtb_file}
+		${dl} --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${dtb_file}
 	fi
 }
 
@@ -152,7 +170,7 @@ install_third_party () {
 		if [ -f /tmp/deb/${thirdparty_file} ] ; then
 			rm -rf /tmp/deb/${thirdparty_file} || true
 		fi
-		wget --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${thirdparty_file}
+		${dl} --directory-prefix=/tmp/deb/ ${mirror}/${release}-${dpkg_arch}/${version}/${thirdparty_file}
 		if [ -f /tmp/deb/thirdparty ] ; then
 			sudo /bin/sh /tmp/deb/thirdparty
 			sudo depmod ${kernel_version} -a
